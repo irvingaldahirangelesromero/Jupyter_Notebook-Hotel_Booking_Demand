@@ -106,7 +106,7 @@ def predecir():
             if valor_texto == "":
                 raise ValueError(f"El campo numérico '{columna}' está vacío.")
             datos_formulario[columna] = float(valor_texto)
-
+#  k
         for columna in CATEGORICAL_COLS:
             valor_texto = request.form.get(columna, "").strip()
             if valor_texto == "":
