@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predicción de tarifa diaria (ADR) — Hotel Booking</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="contenedor">
+        <header>
+            <h1>Predicción de tarifa diaria promedio (ADR)</h1>
+            <p class="subtitulo">
+                Proyecto de regresión — Metodología CRISP-DM<br>
+                Modelo: Escenario PCA + MLPRegressor (red neuronal)
+            </p>
+        </header>
+
+        {% if prediccion is not none %}
+        <div class="resultado resultado-exito">
+            <span class="resultado-etiqueta">Tarifa diaria estimada (ADR):</span>
+            <span class="resultado-valor">${{ "%.2f"|format(prediccion) }}</span>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="resultado resultado-error">
+            <strong>No se pudo calcular la predicción:</strong> {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('predecir') }}" class="formulario">
+            <div class="grid-campos">
+                {% for campo in campos %}
+                <div class="campo">
+                    <label for="{{ campo.nombre }}">{{ campo.etiqueta }}</label>
+
+                    {% if campo.tipo == "numero" %}
+                        <input
+                            type="number"
+                            step="any"
+                            id="{{ campo.nombre }}"
+                            name="{{ campo.nombre }}"
+                            value="{{ request.form.get(campo.nombre, '') }}"
+                            required
+                        >
+                    {% else %}
+                        <select id="{{ campo.nombre }}" name="{{ campo.nombre }}" required>
+                            <option value="" disabled {% if not request.form.get(campo.nombre) %}selected{% endif %}>
+                                Selecciona una opción
+                            </option>
+                            {% for opcion in campo.opciones %}
+                            <option value="{{ opcion }}"
+                                {% if request.form.get(campo.nombre) == opcion %}selected{% endif %}>
+                                {{ opcion }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="boton-predecir">Calcular tarifa estimada</button>
+        </form>
+
+        <footer>
+            <p>Proyecto académico — UTHH. Pipeline entrenado con scikit-learn y servido con Flask.</p>
+        </footer>
+    </div>
+</body>
+</html>
